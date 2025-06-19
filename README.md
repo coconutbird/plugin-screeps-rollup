@@ -46,7 +46,6 @@ export default {
     "protocol": "https",
     "hostname": "screeps.com",
     "port": 443,
-    "path": "/",
     "branch": "main"
   },
   "sim": {
@@ -54,7 +53,6 @@ export default {
     "protocol": "https",
     "hostname": "screeps.com",
     "port": 443,
-    "path": "/",
     "branch": "sim"
   },
   "pserver": {
@@ -63,7 +61,6 @@ export default {
     "protocol": "http",
     "hostname": "1.1.1.1",
     "port": 21025,
-    "path": "/",
     "branch": "main"
   }
 }
