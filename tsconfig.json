@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "lib": ["es2022"],
+    "target": "es2022",
+    "moduleResolution": "Node",
+    "outDir": "dist",
+    "baseUrl": "src",
+    "strict": true,
+    "declaration": true,
+    "experimentalDecorators": true,
+    "noImplicitReturns": true,
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": false
+  },
+  "exclude": ["node_modules"]
+}
