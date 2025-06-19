@@ -6,7 +6,6 @@ import git from "git-rev-sync";
 import { ScreepsAPI } from "screeps-api";
 
 const DEFAULT_CONFIG_FILE = "screeps.config.json";
-const DEFAULT_DESTINATION = "default";
 
 /**
  * The Screeps Rollup plugin configuration file data type.
@@ -42,6 +41,12 @@ export type ScreepsRollupConfig = {
      */
     port?: number;
     /**
+     * The path to the Screeps server API. This is usually "/".
+     * If you are using a custom Screeps server, you might need to change this.
+     * @default "/"
+     */
+    path: string;
+    /**
      * The branch can be set to "auto" to automatically detect the branch from the git repository.
      */
     branch?: string | "auto";
@@ -59,9 +64,14 @@ export type ScreepsRollupOptions = {
   config?: ScreepsRollupConfig | string;
   /**
    * The destination server name in the config file.
-   * @default `default`
+   * @default undefined
    */
   destination?: string;
+  /**
+   * If `true` the plugin will not upload the code to the Screeps server.
+   * @default false
+   */
+  dryRun?: boolean;
 };
 
 type ScreepsCodeList = {
@@ -121,7 +131,9 @@ const upload = async (
   }
 
   if (!options.destination) {
-    options.destination = DEFAULT_DESTINATION;
+    throw new Error(
+      "Destination must be specified in the options or config file."
+    );
   }
 
   // Read the config file and parse it if it's a string
@@ -135,7 +147,7 @@ const upload = async (
     ) as ScreepsRollupConfig;
   }
 
-  const config = options.config[options.destination || "default"];
+  const config = options.config[options.destination];
   if (!config) {
     throw new Error(
       `No configuration found for destination: ${options.destination}`
@@ -168,6 +180,7 @@ const upload = async (
     protocol: config.protocol || "https",
     hostname: config.hostname || "screeps.com",
     port: config.port || 21025,
+    path: config.path || "/",
     branch: branch
   });
 
@@ -227,7 +240,9 @@ export default async function screeps(
         );
       }
 
-      await upload(screepsRollupOptions, bundle, distFile);
+      if (!screepsRollupOptions.dryRun) {
+        await upload(screepsRollupOptions, bundle, distFile);
+      }
     }
   };
 }
