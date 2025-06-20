@@ -1,6 +1,6 @@
 {
   "name": "@coconutbird/plugin-screeps-rollup",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "dist/index.js",
   "scripts": {
     "build": "rollup --config"
