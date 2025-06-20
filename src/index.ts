@@ -68,6 +68,11 @@ export type ScreepsRollupOptions = {
    */
   destination?: string;
   /**
+   * If `true`, the plugin will not throw an error if the destination is not passed.
+   * @default false
+   */
+  allowNoDestination?: boolean;
+  /**
    * If `true` the plugin will not upload the code to the Screeps server.
    * @default false
    */
@@ -131,8 +136,16 @@ const upload = async (
   }
 
   if (!options.destination) {
+    if (options.allowNoDestination) {
+      console.warn(
+        "No destination specified in options so no code will be uploaded."
+      );
+
+      return;
+    }
+
     throw new Error(
-      "Destination must be specified in the options or config file."
+      "Destination must be specified in options or allowNoDestination is set."
     );
   }
 

@@ -13,6 +13,7 @@ In `rollup.config.mjs`
 ```mjs
 import screeps from "@coconutbird/plugin-screeps-rollup";
 
+/** @type {import('rollup').RollupOptions} */
 export default {
   // ...
   output: {
@@ -22,7 +23,8 @@ export default {
     // ...
     screeps({
       config: "./screeps.config.json", // The path to read the config from
-      destination: process.env.DEST // The server to upload the code to
+      destination: process.env.DEST, // The server to upload the code to
+      allowNoDestination: false // If true the plugin will not error on no destination
     })
   ]
 };
