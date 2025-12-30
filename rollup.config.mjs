@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-ignore - no types available
 import clear from 'rollup-plugin-clear';
 import typescript from '@rollup/plugin-typescript';
-import nodeResolve from '@rollup/plugin-node-resolve';
 
+// @ts-ignore - process is available in Node
 const watchMode = process.env.ROLLUP_WATCH === 'true';
 
 export default {
