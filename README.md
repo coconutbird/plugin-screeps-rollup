@@ -11,22 +11,22 @@ npm install --save-dev @coconutbird/plugin-screeps-rollup
 In `rollup.config.mjs`
 
 ```mjs
-import screeps from "@coconutbird/plugin-screeps-rollup";
+import screeps from '@coconutbird/plugin-screeps-rollup';
 
 /** @type {import('rollup').RollupOptions} */
 export default {
   // ...
   output: {
-    sourcemap: true // If set to true your source maps will be made screeps friendly and uploaded
+    sourcemap: true, // If set to true your source maps will be made screeps friendly and uploaded
   },
   plugins: [
     // ...
     screeps({
-      config: "./screeps.config.json", // The path to read the config from
+      config: './screeps.config.json', // The path to read the config from
       destination: process.env.DEST, // The server to upload the code to
-      allowNoDestination: false // If true the plugin will not error on no destination
-    })
-  ]
+      allowNoDestination: false, // If true the plugin will not error on no destination
+    }),
+  ],
 };
 ```
 

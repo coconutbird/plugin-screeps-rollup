@@ -1,11 +1,11 @@
-import fs from "fs";
-import path from "path";
-import type { OutputBundle, OutputOptions, Plugin } from "rollup";
-import git from "git-rev-sync";
+import fs from 'fs';
+import path from 'path';
+import type { OutputBundle, OutputOptions, Plugin } from 'rollup';
+import git from 'git-rev-sync';
 
-import { ScreepsAPI } from "screeps-api";
+import { ScreepsAPI } from 'screeps-api';
 
-const DEFAULT_CONFIG_FILE = "screeps.config.json";
+const DEFAULT_CONFIG_FILE = 'screeps.config.json';
 
 /**
  * The Screeps Rollup plugin configuration file data type.
@@ -49,7 +49,7 @@ export type ScreepsRollupConfig = {
     /**
      * The branch can be set to "auto" to automatically detect the branch from the git repository.
      */
-    branch?: string | "auto";
+    branch?: string | 'auto';
   };
 };
 
@@ -91,12 +91,8 @@ const generateSourceMaps = (bundle: OutputBundle) => {
   for (let itemName in bundle) {
     const item = bundle[itemName];
 
-    if (
-      itemName.endsWith(".js.map") &&
-      item.type === "asset" &&
-      typeof item.source === "string"
-    ) {
-      item.source = "module.exports = " + item.source + ";";
+    if (itemName.endsWith('.js.map') && item.type === 'asset' && typeof item.source === 'string') {
+      item.source = 'module.exports = ' + item.source + ';';
     }
   }
 };
@@ -107,18 +103,17 @@ const getCodeList = async (distFile: string): Promise<ScreepsCodeList> => {
   for (const file of files) {
     const filepath = path.join(distFile, file);
 
-    const parts = file.split(".");
+    const parts = file.split('.');
     const filename = parts[0];
-    const extension =
-      parts.length > 1 ? parts.slice(1).join(".").toLowerCase() : "";
+    const extension = parts.length > 1 ? parts.slice(1).join('.').toLowerCase() : '';
 
-    if (extension === "js") {
-      codeList[filename] = fs.readFileSync(filepath, "utf-8");
-    } else if (extension === "js.map") {
-      codeList[file] = fs.readFileSync(filepath, "utf-8");
+    if (extension === 'js') {
+      codeList[filename] = fs.readFileSync(filepath, 'utf-8');
+    } else if (extension === 'js.map') {
+      codeList[file] = fs.readFileSync(filepath, 'utf-8');
     } else {
       codeList[filename] = {
-        binary: fs.readFileSync(filepath).toString("base64")
+        binary: fs.readFileSync(filepath).toString('base64'),
       };
     }
   }
@@ -126,75 +121,59 @@ const getCodeList = async (distFile: string): Promise<ScreepsCodeList> => {
   return codeList;
 };
 
-const upload = async (
-  options: ScreepsRollupOptions,
-  bundle: OutputBundle,
-  distFile: string
-) => {
+const upload = async (options: ScreepsRollupOptions, bundle: OutputBundle, distFile: string) => {
   if (!options.config) {
     options.config = DEFAULT_CONFIG_FILE;
   }
 
   if (!options.destination) {
     if (options.allowNoDestination) {
-      console.warn(
-        "No destination specified in options so no code will be uploaded."
-      );
+      console.warn('No destination specified in options so no code will be uploaded.');
 
       return;
     }
 
-    throw new Error(
-      "Destination must be specified in options or allowNoDestination is set."
-    );
+    throw new Error('Destination must be specified in options or allowNoDestination is set.');
   }
 
   // Read the config file and parse it if it's a string
-  if (typeof options.config === "string") {
+  if (typeof options.config === 'string') {
     if (!fs.existsSync(options.config)) {
       throw new Error(`Config file not found: ${options.config}`);
     }
 
-    options.config = JSON.parse(
-      fs.readFileSync(options.config, "utf-8")
-    ) as ScreepsRollupConfig;
+    options.config = JSON.parse(fs.readFileSync(options.config, 'utf-8')) as ScreepsRollupConfig;
   }
 
   const config = options.config[options.destination];
   if (!config) {
-    throw new Error(
-      `No configuration found for destination: ${options.destination}`
-    );
+    throw new Error(`No configuration found for destination: ${options.destination}`);
   }
 
   if ((!config.email || !config.password) && !config.token) {
-    throw new Error(
-      "Either 'email' and 'password' or 'token' must be provided in the config."
-    );
+    throw new Error("Either 'email' and 'password' or 'token' must be provided in the config.");
   }
 
   let branch: string;
-  if (config.branch === "auto") {
+  if (config.branch === 'auto') {
     branch = git.branch();
 
     if (!branch) {
-      throw new Error(
-        "Failed to detect git branch. Ensure you are in a git repository."
-      );
+      throw new Error('Failed to detect git branch. Ensure you are in a git repository.');
     }
   } else {
-    branch = config.branch || "default";
+    branch = config.branch || 'default';
   }
 
   const api = new ScreepsAPI({
     email: config.email,
     password: config.password,
     token: config.token,
-    protocol: config.protocol || "https",
-    hostname: config.hostname || "screeps.com",
+    protocol: config.protocol || 'https',
+    hostname: config.hostname || 'screeps.com',
     port: config.port || 21025,
-    path: config.path || "/",
-    branch: branch
+    path: config.path || '/',
+    branch: branch,
   });
 
   // Authenticate if token is not provided
@@ -202,7 +181,7 @@ const upload = async (
     const auth = await api.auth(config.email, config.password);
 
     if (!auth.ok) {
-      throw new Error("Authentication failed");
+      throw new Error('Authentication failed');
     }
 
     api.token = auth.token;
@@ -210,12 +189,12 @@ const upload = async (
 
   const branches = await api.raw.user.branches();
   if (!branches.ok) {
-    throw new Error("Failed to fetch branches");
+    throw new Error('Failed to fetch branches');
   }
 
   const code = await getCodeList(distFile);
   if (!branches.list.some((branch: any) => branch.branch === branch)) {
-    await api.raw.user.cloneBranch("", branch, code);
+    await api.raw.user.cloneBranch('', branch, code);
   }
 
   await api.code.set(branch, code, null);
@@ -223,9 +202,7 @@ const upload = async (
   console.log(`Code uploaded to branch: ${branch}`);
 };
 
-export default async function screeps(
-  screepsRollupOptions: ScreepsRollupOptions
-): Promise<Plugin> {
+export default async function screeps(screepsRollupOptions: ScreepsRollupOptions): Promise<Plugin> {
   if (!screepsRollupOptions) {
     screepsRollupOptions = {};
   }
@@ -235,27 +212,19 @@ export default async function screeps(
   }
 
   return {
-    name: "screeps",
-    generateBundle: async (
-      options: OutputOptions,
-      bundle: OutputBundle
-    ): Promise<void> => {
+    name: 'screeps',
+    generateBundle: async (options: OutputOptions, bundle: OutputBundle): Promise<void> => {
       generateSourceMaps(bundle);
     },
-    writeBundle: async (
-      options: OutputOptions,
-      bundle: OutputBundle
-    ): Promise<void> => {
+    writeBundle: async (options: OutputOptions, bundle: OutputBundle): Promise<void> => {
       const distFile = options.dir || options.file;
       if (!distFile) {
-        throw new Error(
-          "Output directory or file must be specified to read the code."
-        );
+        throw new Error('Output directory or file must be specified to read the code.');
       }
 
       if (!screepsRollupOptions.dryRun) {
         await upload(screepsRollupOptions, bundle, distFile);
       }
-    }
+    },
   };
 }
