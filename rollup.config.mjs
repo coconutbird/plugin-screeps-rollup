@@ -1,8 +1,5 @@
-import clear from 'rollup-plugin-clear';
-import typescript from "@rollup/plugin-typescript";
-import nodeResolve from '@rollup/plugin-node-resolve';
-
-const watchMode = process.env.ROLLUP_WATCH === 'true';
+import del from 'rollup-plugin-delete';
+import typescript from '@rollup/plugin-typescript';
 
 export default {
   input: 'src/index.ts',
@@ -10,17 +7,6 @@ export default {
     dir: 'dist',
     format: 'cjs',
   },
-  plugins: [
-    clear({
-      targets: ['dist'],
-      watch: watchMode
-    }),
-    typescript(),
-  ],
-  external: [
-    "fs",
-    "path",
-    "git-rev-sync",
-    "screeps-api",
-  ]
-}
+  plugins: [del({ targets: 'dist/*', runOnce: true }), typescript()],
+  external: ['fs', 'path', 'git-rev-sync', 'screeps-api'],
+};
