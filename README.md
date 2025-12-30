@@ -1,5 +1,7 @@
 # Rollup Plugin for Screeps World
 
+[![CI](https://github.com/coconutbird/plugin-screeps-rollup/actions/workflows/ci.yml/badge.svg)](https://github.com/coconutbird/plugin-screeps-rollup/actions/workflows/ci.yml)
+
 A Rollup plugin that builds and deploys your code to Screeps servers.
 
 ## Install
