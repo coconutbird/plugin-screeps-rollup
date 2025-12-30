@@ -193,7 +193,7 @@ const upload = async (options: ScreepsRollupOptions, bundle: OutputBundle, distF
   }
 
   const code = await getCodeList(distFile);
-  if (!branches.list.some((branch: any) => branch.branch === branch)) {
+  if (!branches.list.some((x: any) => x.branch === branch)) {
     await api.raw.user.cloneBranch('', branch, code);
   }
 
